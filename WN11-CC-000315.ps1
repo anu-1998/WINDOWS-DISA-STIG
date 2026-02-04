@@ -5,8 +5,8 @@
 
 .NOTES
     Author          : Anaswara Raj
-    LinkedIn        : 
-    GitHub          :
+    LinkedIn        : https://www.linkedin.com/in/anaswara-raj/
+    GitHub          : https://github.com/anu-1998
     Date Created    : 2026-02-01
     Last Modified   : 2026-02-03
     Version         : 1.1
