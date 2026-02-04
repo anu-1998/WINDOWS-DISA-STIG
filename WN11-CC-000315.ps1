@@ -31,29 +31,29 @@
 
 # Registry paths and value name
 # STIG ID: WN11-CC-000315
-# Disable Windows Installer elevated privileges
+# Disable Windows Installer elevated privilege
 
-$paths = @(
-    "HKLM:\Software\Policies\Microsoft\Windows\Installer",
-    "HKCU:\Software\Policies\Microsoft\Windows\Installer"
-)
-$regName = "AlwaysInstallElevated"
 
-foreach ($path in $paths) {
-    # Create registry key if missing
-    if (-not (Test-Path $path)) {
-        New-Item -Path $path -Force | Out-Null
-    }
+# Import the GroupPolicy module
+Import-Module GroupPolicy
 
-    # Set the value to Disabled (0)
-    New-ItemProperty -Path $path -Name $regName -PropertyType DWord -Value 0 -Force | Out-Null
+# Set the policy to Disabled in the Local Computer Policy
+Set-GPRegistryValue -Name "Local Computer Policy" `
+    -Key "HKLM\Software\Policies\Microsoft\Windows\Installer" `
+    -ValueName "AlwaysInstallElevated" `
+    -Type DWord `
+    -Value 0
 
-    Write-Host "[$path] AlwaysInstallElevated set to 0 (Disabled)"
-}
+# Refresh policies
+gpupdate /force
 
-# Refresh Group Policy to enforce immediately
-Write-Host "Refreshing Group Policy..."
-gpupdate /force | Out-Null
+# ✅ Key Point
+#Even if gpedit.msc says “Not Configured”, if the registry values are set correctly, your system complies with the STIG:
 
-Write-Host "WN11-CC-000315 remediation applied successfully."
+
+# Check if AlwaysInstallElevated is disabled
+Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\Installer" -Name AlwaysInstallElevated
+Get-ItemProperty -Path "HKCU:\Software\Policies\Microsoft\Windows\Installer" -Name AlwaysInstallElevated
+
+
 
