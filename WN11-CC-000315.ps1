@@ -26,16 +26,27 @@
     PS C:\> .\remediation_WN11-CC-000315.ps1
 #>
 
-# Registry paths
-$path1 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer"
-$path2 = "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Installer"
+# STIG ID: WN11-CC-000315
+# Description: Disable Windows Installer elevated privileges for both machine and user
 
-# Create registry keys if they do not exist
-New-Item -Path $path1 -Force | Out-Null
-New-Item -Path $path2 -Force | Out-Null
+# Registry paths and value name
+$paths = @(
+    "HKLM:\Software\Policies\Microsoft\Windows\Installer",
+    "HKCU:\Software\Policies\Microsoft\Windows\Installer"
+)
+$regName = "AlwaysInstallElevated"
 
-# Set the policy to Disabled (0)
-Set-ItemProperty -Path $path1 -Name "AlwaysInstallElevated" -Value 0
-Set-ItemProperty -Path $path2 -Name "AlwaysInstallElevated" -Value 0
+foreach ($path in $paths) {
 
-Write-Host "STIG WN11-CC-000315 applied: Always install with elevated privileges is disabled."
+    # Create registry key if it does not exist
+    if (-not (Test-Path $path)) {
+        New-Item -Path $path -Force | Out-Null
+    }
+
+    # Set policy value to Disabled (0)
+    Set-ItemProperty -Path $path -Name $regName -Value 0
+    Write-Output "[$path] AlwaysInstallElevated set to 0 (Disabled)."
+}
+
+Write-Output "WN11-CC-000315 remediation applied successfully."
+
