@@ -30,6 +30,9 @@
 # Description: Disable Windows Installer elevated privileges for both machine and user
 
 # Registry paths and value name
+# STIG ID: WN11-CC-000315
+# Disable Windows Installer elevated privileges
+
 $paths = @(
     "HKLM:\Software\Policies\Microsoft\Windows\Installer",
     "HKCU:\Software\Policies\Microsoft\Windows\Installer"
@@ -37,16 +40,20 @@ $paths = @(
 $regName = "AlwaysInstallElevated"
 
 foreach ($path in $paths) {
-
-    # Create registry key if it does not exist
+    # Create registry key if missing
     if (-not (Test-Path $path)) {
         New-Item -Path $path -Force | Out-Null
     }
 
-    # Set policy value to Disabled (0)
-    Set-ItemProperty -Path $path -Name $regName -Value 0
-    Write-Output "[$path] AlwaysInstallElevated set to 0 (Disabled)."
+    # Set the value to Disabled (0)
+    New-ItemProperty -Path $path -Name $regName -PropertyType DWord -Value 0 -Force | Out-Null
+
+    Write-Host "[$path] AlwaysInstallElevated set to 0 (Disabled)"
 }
 
-Write-Output "WN11-CC-000315 remediation applied successfully."
+# Refresh Group Policy to enforce immediately
+Write-Host "Refreshing Group Policy..."
+gpupdate /force | Out-Null
+
+Write-Host "WN11-CC-000315 remediation applied successfully."
 
